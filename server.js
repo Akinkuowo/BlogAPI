@@ -25,23 +25,47 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-app.post('/login', (req,res) => {
-    db.select('email', 'password').from('users')
-    .then('where', '=', req.body.email)
-    .then(response => {
-		const isValid = bcrypt.compareSync(password, response[0].hash);
-		if(isValid){
-			return db.select('*').from('users')
-			.where('email', '=', email)
-			.then(user => {
-				res.json(user[0])
-			})
-			.catch(err => res.status(400).json('unable to get user'))
-		}else{
-				res.status(400).json('username and password is incorrect')
-		}
-	}).catch(err => res.status(400).json('username and password is incorrect'))
+app.get('/', (req, res) => {
+     db.select('*').from('users')
+        .then(user => {
+            res.json(user)
+     })
 })
+
+app.post('/login', (req,res) => {
+    const {  email, password } 	= req.body;
+    if( !email || !password){
+		return res.status(400).json({
+            invalid:   'Bad form submittion request'
+        })
+    }
+    db.select('email', 'password').from('users')
+	.where('email', '=', email)
+	.then(response => {
+        const isValid = bcrypt.compareSync(password, response[0].password);   
+            if(isValid){
+                return db.select('*').from('users')
+                .where('email', '=', email)
+                .then(user => {
+                    res.json(user[0])
+                }).catch(err => res.status(400).json({
+                    userNotFound:  ['unable to get user']
+                 })
+              )
+            }else{
+				res.status(400).json({
+                    incorrectPassword:    ['Your password is incorrect']
+                })
+		    }
+    }).catch(err => res.status(404)
+        .json({
+            Invalid: ['Email does not exist']
+        })
+    )
+
+
+})
+
 
 app.post('/signup', (req, res) => { 
     const { email, name, password } = req.body;
@@ -66,9 +90,7 @@ app.post('/signup', (req, res) => {
     
 })
 
-app.get('/', (req, res) => {
-    res.json('connected to');
-})
+
 
 // app.get('/', (req, res) => { res.json(db.users) })
 app.post('/signin', (req, res) => { signin.handleSignin(req, res, db, bcrypt) })
