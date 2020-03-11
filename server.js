@@ -1,4 +1,5 @@
 const express = require('express');
+const fileUpload = require('express-fileupload');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt-nodejs');
 const cors = require('cors');
@@ -24,6 +25,7 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(cors());
+app.use(fileUpload());
 
 app.get('/', (req, res) => {
      db.select('*').from('users')
@@ -56,7 +58,7 @@ app.post('/login', (req,res) => {
 				res.status(400).json({
                     incorrectPassword:    ['Your password is incorrect']
                 })
-		    }
+		    }  
     }).catch(err => res.status(404)
         .json({
             Invalid: ['Email does not exist']
@@ -90,9 +92,80 @@ app.post('/signup', (req, res) => {
     
 })
 
+app.get('/categories', (req, res) => {
+    db.select('*').from('categories')
+        .then(category => {
+            res.json(category)
+     })
+})
 
 
-// app.get('/', (req, res) => { res.json(db.users) })
+app.post('/upload', (req, res) => {
+    
+    if(req.files === null){
+        return res.status(400).json({msg: 'No file was uploaded'})
+    }else {
+        const  image = req.files.image;
+        image.mv(`C:/Users/ASA/Desktop/work/PLBlog/blog/public/uploads/${image.name}`, err => {
+            if(err){
+                console.log(err);
+                return res.status(400).send(err)
+            }else{
+                res.status(200).json({
+                    message: 'Image was Uploaded successfully'
+                })
+            }
+
+        })
+    }
+})
+
+
+app.post('/create/article', (req, res) => {
+    const { title, category, Content, image } = req.body;
+    
+    if(!Content){
+        return res.status(400).json({
+            message: 'An Article Content is needed.'
+        })
+    }else if(!title){
+        res.status(400).json({
+            title: 'An Article title is needed.'
+        })
+    }else if(category === null){
+        res.status(400).json({
+            title: 'A category is needed.'
+        })
+    }else{      
+        db('article')
+        .returning('*')
+        .insert({
+                title: title,
+                category: category,
+                content: Content,
+                image_url: image,
+                date: new Date()
+        }).then(response => {
+            res.status(200).json({
+                Msg: 'Article was created successfully'
+            })
+        }).catch(error => res.status(400)
+            .json({
+                error: ['an error occur while trying to post your blog']
+            })
+        )
+        
+        }
+})
+
+app.get('/articles', (req, res) => {
+    db.select('*').from('article')
+        .then(article => {
+            res.json(article)
+     })
+})
+
+app.get('/', (req, res) => { res.json(db.users) })
 app.post('/signin', (req, res) => { signin.handleSignin(req, res, db, bcrypt) })
 // app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt) })
 app.get('/profile/:id', (req, res) => {profile.handleProfile(req, res, db) })
