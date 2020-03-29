@@ -5,10 +5,10 @@ const bcrypt = require('bcrypt-nodejs');
 const cors = require('cors');
 const knex = require('knex');
 
-const signin = require('./controllers/signin');
-const register = require('./controllers/register');
-const profile = require('./controllers/profile');
-const image = require('./controllers/image');
+// const signin = require('./controllers/signin');
+// const register = require('./controllers/register');
+// const profile = require('./controllers/profile');
+// const image = require('./controllers/image');
 
 const db = knex({
 	client: 'pg',
@@ -122,9 +122,11 @@ app.post('/upload', (req, res) => {
 
 
 app.post('/create/article', (req, res) => {
-    const { title, category, Content, image } = req.body;
+    const { title, category, Content, image, author } = req.body;
     
+    console.log(author)
     if(!Content){
+        console.log('file to load')
         return res.status(400).json({
             message: 'An Article Content is needed.'
         })
@@ -136,15 +138,16 @@ app.post('/create/article', (req, res) => {
         res.status(400).json({
             title: 'A category is needed.'
         })
-    }else{      
-        db('article')
+    }else{    
+        db('new_articles')
         .returning('*')
         .insert({
                 title: title,
                 category: category,
                 content: Content,
                 image_url: image,
-                date: new Date()
+                date: new Date(),
+                author: author
         }).then(response => {
             res.status(200).json({
                 Msg: 'Article was created successfully'
@@ -159,11 +162,23 @@ app.post('/create/article', (req, res) => {
 })
 
 app.get('/articles', (req, res) => {
-    db.select('*').from('article')
+    db.select('*').from('new_articles').orderBy('date', 'desc')
         .then(article => {
             res.json(article)
      })
 })
+
+
+app.get('/user/articles', (req, res) => {
+    const { author } = req.body;
+    console.log(author)
+    // db.select('*').from('new_articles')
+	// .where('author', '=', author)
+	// .then(articles => {
+    //     console.log(articles)
+    //     res.json(articles)
+    // })
+})  
 
 app.get('/', (req, res) => { res.json(db.users) })
 app.post('/signin', (req, res) => { signin.handleSignin(req, res, db, bcrypt) })
@@ -172,7 +187,7 @@ app.get('/profile/:id', (req, res) => {profile.handleProfile(req, res, db) })
 
 
 
-app.listen(3100, ()=> {
-	console.log(`app is running on port 3100`)
+app.listen(4000, ()=> {
+	console.log(`app is running on port 4000`)
 }); 
 
