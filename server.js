@@ -124,7 +124,8 @@ app.post('/upload', (req, res) => {
 app.post('/create/article', (req, res) => {
     const { title, category, Content, image, author } = req.body;
     
-    console.log(author)
+    const slug = title.replace(/\s/g, "_");
+
     if(!Content){
         console.log('file to load')
         return res.status(400).json({
@@ -147,6 +148,7 @@ app.post('/create/article', (req, res) => {
                 content: Content,
                 image_url: image,
                 date: new Date(),
+                slug: slug,
                 author: author
         }).then(response => {
             res.status(200).json({
@@ -171,7 +173,6 @@ app.get('/articles', (req, res) => {
 
 app.get('/user/articles', (req, res) => {
     const { author } = req.body;
-    console.log(author)
     // db.select('*').from('new_articles')
 	// .where('author', '=', author)
 	// .then(articles => {
