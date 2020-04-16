@@ -181,6 +181,16 @@ app.get('/user/articles', (req, res) => {
     // })
 })  
 
+app.get('/article/comment', (req, res) => {
+    const { author } = req.body;
+    // db.select('*').from('new_articles')
+	// .where('author', '=', author)
+	// .then(articles => {
+    //     console.log(articles)
+    //     res.json(articles)
+    // })
+})  
+
 app.get('/', (req, res) => { res.json(db.users) })
 app.post('/signin', (req, res) => { signin.handleSignin(req, res, db, bcrypt) })
 // app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt) })
@@ -188,7 +198,7 @@ app.get('/profile/:id', (req, res) => {profile.handleProfile(req, res, db) })
 
 
 
-app.listen(4000, ()=> {
-	console.log(`app is running on port 4000`)
+app.listen(process.env.PORT || 4000, ()=> {
+	console.log(`app is running on port ${process.env.PORT}`)
 }); 
 
