@@ -85,7 +85,7 @@ app.post('/signup', (req, res) => {
     }).then(response => {
         res.json(response)
     }).catch(error => res.status(400).json({
-        email: ['email already taken']
+        email: ['email already taken!']
     })
     
     )
