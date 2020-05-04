@@ -28,10 +28,7 @@ app.use(cors());
 app.use(fileUpload());
 
 app.get('/', (req, res) => {
-     db.select('*').from('users')
-        .then(user => {
-            res.json(user)
-     })
+    res.json({'it is working'})
 })
 
 app.post('/login', (req,res) => {
@@ -181,14 +178,60 @@ app.get('/user/articles', (req, res) => {
     // })
 })  
 
-app.get('/article/comment', (req, res) => {
-    const { author } = req.body;
-    // db.select('*').from('new_articles')
-	// .where('author', '=', author)
-	// .then(articles => {
-    //     console.log(articles)
-    //     res.json(articles)
-    // })
+app.post('/comments', (req,res) => {
+    const { blog_id } = req.body
+    // console.log(blog_id)
+    db.select('*').from('blog_comments').orderBy('date', 'desc')
+        .where('blog_id', '=', blog_id)
+        .then(comments => {
+            res.json(comments)
+        }).catch(err => res.status(400).json({
+            CommentsNotFound:  ['unable to get comments']
+        })
+    )
+})
+
+app.post('/article/comment', (req, res) => {
+    const { name, comment, blog_id } = req.body;
+    if(!name){
+        console.log(name)
+        db('blog_comments')
+        .returning('*')
+        .insert({
+                name: annoymus,
+                comment: comment,
+                blog_id: blog_id,
+                date: new Date()
+        }).then(response => {
+            res.status(200).json({
+                Msg: 'comment added successfully'
+            })
+        }).catch(error => res.status(400)
+            .json({
+                error: ['an error occur while trying to add your comment']
+            })
+        )
+    }else{
+        db('blog_comments')
+        .returning('*')
+        .insert({
+                name: name,
+                comment: comment,
+                blog_id: blog_id,
+                date: new Date()
+        }).then(response => {
+            res.status(200).json({
+                Msg: 'comment added successfully'
+            })
+        }).catch(error => res.status(400)
+            .json({
+                error: ['an error occur while trying to add your comment']
+            })
+        )
+    }
+        
+
+    
 })  
 
 app.get('/', (req, res) => { res.json(db.users) })
@@ -199,6 +242,6 @@ app.get('/profile/:id', (req, res) => {profile.handleProfile(req, res, db) })
 
 
 app.listen(process.env.PORT || 4000, ()=> {
-	console.log(`app is running on port ${process.env.PORT}`)
+	console.log(`app is running on port 4000 || ${process.env.PORT}`)
 }); 
 
