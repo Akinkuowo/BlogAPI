@@ -28,7 +28,10 @@ app.use(cors());
 app.use(fileUpload());
 
 app.get('/', (req, res) => {
-    res.json({'it is working'})
+     db.select('*').from('users')
+        .then(user => {
+            res.json(user)
+     })
 })
 
 app.post('/login', (req,res) => {
