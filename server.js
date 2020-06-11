@@ -28,10 +28,11 @@ app.use(cors());
 app.use(fileUpload());
 
 app.get('/', (req, res) => {
-     db.select('*').from('users')
-        .then(user => {
-            res.json(user)
-     })
+    //  db.select('*').from('users')
+    //     .then(user => {
+    //         res.json(user)
+    //  })
+    res.json('It working')
 })
 
 app.post('/login', (req,res) => {
@@ -245,6 +246,6 @@ app.get('/profile/:id', (req, res) => {profile.handleProfile(req, res, db) })
 
 
 app.listen(process.env.PORT || 4000, ()=> {
-	console.log(`app is running on port ${process.env.PORT} `)
+	console.log(`app is running onadd port ${process.env.PORT} `)
 }); 
 
