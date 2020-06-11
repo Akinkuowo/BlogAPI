@@ -245,6 +245,6 @@ app.get('/profile/:id', (req, res) => {profile.handleProfile(req, res, db) })
 
 
 app.listen(process.env.PORT || 4000, ()=> {
-	console.log(`app is running on port 4000 || ${process.env.PORT}`)
+	console.log(`app is running on port 4000 `)
 }); 
 
