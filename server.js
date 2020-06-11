@@ -13,10 +13,8 @@ const knex = require('knex');
 const db = knex({
 	client: 'pg',
 	connection: {
-        host: 'localhost',
-        user: 'postgres',
-        password: '7386',
-        database: 'PLBlogDB'
+        host: process.env.DATABASE_URL,
+        ssl: true,
 	}
 });
 
