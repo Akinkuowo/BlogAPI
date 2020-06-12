@@ -90,6 +90,26 @@ app.post('/signup', (req, res) => {
     
 })
 
+app.post('/add/categories', (req, res) => {
+    const { Categories } = req.body;
+    if(!Categories ){
+		return res.status(400).json('Bad form submittion request')
+	}
+    db('categories')
+    .returning('*')
+    .insert({
+        categories: Categories,
+    }).then(response => {
+        res.json(response)
+    }).catch(error => res.status(400).json({
+        email: ['Category already Exist!']
+    })
+    
+    )
+    
+})
+
+
 app.get('/categories', (req, res) => {
     db.select('*').from('categories')
         .then(category => {
