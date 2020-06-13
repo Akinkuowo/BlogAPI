@@ -124,7 +124,7 @@ app.post('/upload', (req, res) => {
         return res.status(400).json({msg: 'No file was uploaded'})
     }else {
         const  image = req.files.image;
-        image.mv(`https://github.com/Akinkuowo/Blog/tree/master/public/uploads/${image.name}`, err => {
+        image.mv(`https://github.com/Akinkuowo/Blog/tree/master/uploads/${image.name}`, err => {
             if(err){
                 console.log(err);
                 return res.status(400).send(err)
